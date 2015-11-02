@@ -1,0 +1,90 @@
+user <%= node['rvm_passenger_nginx']['nginx']['user'] %>;
+worker_processes <%= node['rvm_passenger_nginx']['nginx']['workers'] %>;
+pid /var/run/nginx.pid;
+
+<% node['rvm_passenger_nginx']['applications'].each do |app| %>
+<% if app['environment'].nil? || app['environment'].eql?('production') then %>
+env <%= app['name'].upcase %>_SECRET_KEY_BASE=<%= app['secret_key_base'] %>;
+<% end %>
+<% end %>
+
+events {
+	worker_connections <%= node['rvm_passenger_nginx']['nginx']['connections'] %>;
+	# multi_accept on;
+}
+
+http {
+
+	##
+	# Basic Settings
+	##
+
+	sendfile on;
+	tcp_nopush on;
+	tcp_nodelay on;
+	keepalive_timeout 65;
+	types_hash_max_size 2048;
+	# server_tokens off;
+
+	# server_names_hash_bucket_size 64;
+	# server_name_in_redirect off;
+
+	include /etc/nginx/mime.types;
+	default_type application/octet-stream;
+
+	##
+	# SSL Settings
+	##
+
+	ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # Dropping SSLv3, ref: POODLE
+	ssl_prefer_server_ciphers on;
+
+	##
+	# Logging Settings
+	##
+
+	access_log /var/log/nginx/access.log;
+	error_log /var/log/nginx/error.log;
+
+	##
+	# Gzip Settings
+	##
+
+	gzip on;
+	gzip_disable "msie6";
+
+	# gzip_vary on;
+	# gzip_proxied any;
+	# gzip_comp_level 6;
+	# gzip_buffers 16 8k;
+	# gzip_http_version 1.1;
+	# gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+
+	##
+	# nginx-naxsi config
+	##
+	# Uncomment it if you installed nginx-naxsi
+	##
+
+	# include /etc/nginx/naxsi_core.rules;
+
+  ##
+  # Passenger config
+  ##
+
+  passenger_root /usr/lib/ruby/vendor_ruby/phusion_passenger/locations.ini;
+
+  # -- Logging Format -- #
+
+  log_format combined_timing '$remote_addr - $remote_user [$time_local] '
+      '"$request" $status $body_bytes_sent '
+      '"$http_referer" "$http_user_agent" '
+      '$request_time $upstream_response_time $pipe';
+
+	##
+	# Virtual Host Configs
+	##
+
+	include /etc/nginx/conf.d/*.conf;
+	include /etc/nginx/sites-enabled/*;
+}

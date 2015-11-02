@@ -1,0 +1,35 @@
+server {
+    listen 80;
+    server_name <%= @resource[:server] %>;
+
+    access_log <%= node['rvm_passenger_nginx']['nginx']['log_dir'] %>/<%= @resource[:name] %>.access.log combined;
+    error_log <%= node['rvm_passenger_nginx']['nginx']['log_dir'] %>/<%= @resource[:name] %>.error.log;
+
+    location / {
+        <% if @resource[:static] %>
+        root <%= @resource[:dir] %>;
+        <% else %>
+        passenger_enabled on;
+
+        <% if @resource[:ruby] %>
+        passenger_ruby <%= @resource[:ruby] %>;
+        <% end %>
+
+        root <%= @resource[:dir] %>/public;
+
+        <% if @resource[:env] %>
+        passenger_app_env "<%= @resource[:env] %>";
+        <% elsif @resource[:rails_env] %>
+        rails_env "<%= @resource[:rails_env] %>";
+        <% end %>
+
+        <% if @resource[:passenger_user] %>
+        passenger_user "<%= @resource[:passenger_user] %>";
+        <% end %>
+
+        passenger_min_instances <%= @resource[:min_instances] || node['rvm_passenger_nginx']['passenger']['site']['min_instances'] %>;
+
+        client_max_body_size <%= @resource[:max_body_size] || node['rvm_passenger_nginx']['passenger']['site']['max_body_size'] %>;
+				<% end %>
+    }
+}
