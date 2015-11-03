@@ -12,10 +12,14 @@ Requirements
 **RVM 0.9.4** is required. This is because our cookbook uses chef-rvm to automatically install ruby versions and required gems specified for each application. Special thanks to Aaron Kalin for this cookbook which is awesome and has a lot of features for us to manage RVM (http://martinisoft.github.com/chef-rvm/).
 
 ### Supported Platforms
-* Ubuntu
+* Ubuntu >=12
+* Debian =8
 
 Tested on:
+* Ubuntu 12.04
 * Ubuntu 14.04
+* Ubuntu 15.04
+* Debian 8.1
 
 Recipes
 ------------
@@ -219,7 +223,7 @@ This defines the remote user that owns that certificate. This is not a required 
 
 License  & Authors
 ------------
-- Author:: Victor D Nava (<viko.nava@gmail.com>)
+- Author:: Victor D Nava (<admin@vikonava.com>)
 
 ```text
 Copyright:: 2011-2015, Chef Software, Inc

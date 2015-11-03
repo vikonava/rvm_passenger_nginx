@@ -19,12 +19,10 @@ server {
 
         <% if @resource[:env] %>
         passenger_app_env "<%= @resource[:env] %>";
-        <% elsif @resource[:rails_env] %>
-        rails_env "<%= @resource[:rails_env] %>";
         <% end %>
 
-        <% if @resource[:passenger_user] %>
-        passenger_user "<%= @resource[:passenger_user] %>";
+        <% if @resource[:user] %>
+        passenger_user "<%= @resource[:user] %>";
         <% end %>
 
         passenger_min_instances <%= @resource[:min_instances] || node['rvm_passenger_nginx']['passenger']['site']['min_instances'] %>;

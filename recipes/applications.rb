@@ -9,7 +9,7 @@ user = node['rvm_passenger_nginx']['passenger']['user']
 # Delete all sites-enabled to update
 bash "delete /etc/nginx/sites-enabled/*" do
 	code "rm /etc/nginx/sites-enabled/*"
-	ignore_failure true
+	only_if "ls /etc/nginx/sites-enabled/*"
 end
 
 node['rvm_passenger_nginx']['applications'].each do |app|
@@ -68,7 +68,7 @@ node['rvm_passenger_nginx']['applications'].each do |app|
 	end
 
 	# Bundle Install
-	script "bundle install app and migrate db [#{app['name']}]" do
+	script "bundle install app #{app['name']}" do
 		interpreter 'bash'
 		cwd dir
 		user 'root'
@@ -77,6 +77,17 @@ node['rvm_passenger_nginx']['applications'].each do |app|
 			rvm use #{app['ruby']}@rails-#{app['rails']}
 			bundle install 
 		EOF
+	end
+
+	bash "precompile assets of #{app['name']}" do
+		cwd dir
+		user user
+		code <<-EOF
+			source /etc/profile.d/rvm.sh
+			rvm use #{app['ruby']}@rails-#{app['rails']}
+			rake assets:precompile
+		EOF
+		only_if { app['environment'].nil? || app['environment'].downcase.eql?("production") }
 	end
 
 	# Execute DB migration
