@@ -17,6 +17,8 @@ when 'ubuntu'
 		phusion_repo = 'trusty'
 	when '15'
 		phusion_repo = 'vivid'
+	when '16'
+		phusion_repo = 'xenial'
 	else
 		raise "Ubuntu version not supported [#{node['platform_version']}]"
 	end
