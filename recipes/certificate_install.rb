@@ -9,6 +9,19 @@ secret = Chef::EncryptedDataBagItem.load_secret(node['rvm_passenger_nginx']['sec
 user = node['rvm_passenger_nginx']['passenger']['user']
 group = node['rvm_passenger_nginx']['passenger']['group']
 
+directory "/home/#{user}/.ssh" do
+	owner user
+	group user
+	mode  '0700'
+end
+
+file "/home/#{user}/.ssh/config" do
+	action :create_if_missing
+	owner  user
+	group  user
+	mode   '0640'
+end
+
 bash "add /home/#{user}/.ssh/config configurations" do
 	user user
 	code "echo 'Host *\n\tIdentityFile ~/.ssh/%r@%h.priv\n' >> /home/#{user}/.ssh/config"
